@@ -3,423 +3,248 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ক্রিপ্টো সিড স্ক্যানার - GitHub Pages</title>
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <title>অটো ক্রিপ্টো সিড স্ক্যানার</title>
     <script src="https://cdn.jsdelivr.net/npm/bip39@3.0.4/index.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bitcoinjs-lib@6.1.0/dist/bitcoinjs-lib.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <style>
-        :root {
-            --primary: #4CAF50;
-            --secondary: #2196F3;
-            --danger: #f44336;
-            --light: #f5f5f5;
-            --dark: #333;
-        }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: var(--dark);
-            background-color: #f9f9f9;
+            font-family: Arial, sans-serif;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-        }
-        h1, h2, h3 {
-            color: var(--primary);
+            background-color: #f5f5f5;
         }
         .container {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-        .card {
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        .seed-area {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        #seedPhrase {
-            flex-grow: 1;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
+        h1 {
+            color: #2c3e50;
+            text-align: center;
         }
         button {
-            padding: 12px 20px;
+            background-color: #3498db;
+            color: white;
             border: none;
-            border-radius: 4px;
-            font-weight: bold;
+            padding: 10px 15px;
+            border-radius: 5px;
             cursor: pointer;
-            transition: all 0.3s;
-        }
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-        .btn-secondary {
-            background: var(--secondary);
-            color: white;
-        }
-        .btn-danger {
-            background: var(--danger);
-            color: white;
+            font-size: 16px;
+            margin: 5px;
+            transition: background 0.3s;
         }
         button:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
+            background-color: #2980b9;
         }
-        .options {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .option-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .results {
-            margin-top: 20px;
-        }
-        .wallet {
+        #seedPhrase {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
             border: 1px solid #ddd;
-            border-radius: 8px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .result {
+            margin-top: 20px;
             padding: 15px;
-            margin-bottom: 15px;
-            transition: all 0.3s;
-        }
-        .wallet:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .has-balance {
-            border-left: 4px solid var(--primary);
-            background-color: rgba(76, 175, 80, 0.05);
-        }
-        .no-balance {
-            border-left: 4px solid #ddd;
+            border-radius: 5px;
+            background: #f9f9f9;
         }
         .balance {
-            font-weight: bold;
+            margin: 5px 0;
+            padding: 8px;
+            border-left: 3px solid #3498db;
         }
-        .positive-balance {
-            color: var(--primary);
+        .has-balance {
+            border-left-color: #2ecc71;
+            background: rgba(46, 204, 113, 0.1);
         }
-        .zero-balance {
-            color: #777;
-        }
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-        .stat-card {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
+        .loading {
             text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 10px 0;
-            color: var(--primary);
-        }
-        .export-options {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .hidden {
-            display: none;
-        }
-        #loading {
-            text-align: center;
-            padding: 20px;
+            margin: 20px 0;
         }
         .spinner {
             border: 4px solid rgba(0, 0, 0, 0.1);
             border-radius: 50%;
-            border-top: 4px solid var(--primary);
+            border-top: 4px solid #3498db;
             width: 30px;
             height: 30px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
+            margin: 0 auto;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .word-badges {
+        .stats {
             display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin: 10px 0;
+            justify-content: space-around;
+            margin: 20px 0;
+            text-align: center;
         }
-        .word-badge {
-            background: var(--light);
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 14px;
+        .stat-box {
+            padding: 10px;
+            background: #ecf0f1;
+            border-radius: 5px;
+            min-width: 100px;
         }
         .disclaimer {
-            background-color: #fff3cd;
+            background: #fff3cd;
             padding: 15px;
-            border-radius: 4px;
-            margin-top: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
             border-left: 4px solid #ffc107;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>ক্রিপ্টো সিড স্ক্যানার</h1>
+        <h1>অটো ক্রিপ্টো সিড স্ক্যানার</h1>
         
         <div class="disclaimer">
-            <strong>সতর্কতা:</strong> এটি শুধুমাত্র শিক্ষামূলক উদ্দেশ্যে তৈরি করা হয়েছে। বাস্তবে আপনার সিড ফ্রেজ কখনও কোন ওয়েবসাইটে প্রবেশ করাবেন না। এই টুলটি সম্পূর্ণ ক্লায়েন্ট-সাইডে রান করে এবং আপনার সিড ফ্রেজ সার্ভারে পাঠায় না।
+            <strong>সতর্কতা:</strong> এটি শুধুমাত্র শিক্ষামূলক উদ্দেশ্যে। বাস্তবে আপনার সিড ফ্রেজ কখনোই অনলাইনে শেয়ার করবেন না।
         </div>
         
-        <div class="card">
-            <h2>সিড ফ্রেজ জেনারেট করুন</h2>
-            <div class="seed-area">
-                <button id="generate12Btn" class="btn-primary">১২ শব্দের সিড জেনারেট করুন</button>
-                <button id="generate24Btn" class="btn-primary">২৪ শব্দের সিড জেনারেট করুন</button>
-                <button id="clearBtn" class="btn-danger">ক্লিয়ার করুন</button>
-            </div>
-            
-            <div class="word-badges" id="wordBadges"></div>
-            
-            <textarea id="seedPhrase" rows="2" placeholder="এখানে আপনার সিড ফ্রেজ লিখুন বা পেস্ট করুন..."></textarea>
-            
-            <div class="seed-area" style="margin-top: 15px;">
-                <button id="scanBtn" class="btn-secondary">ব্যালেন্স স্ক্যান শুরু করুন</button>
-            </div>
+        <div>
+            <button id="autoGenerate">অটো জেনারেট ও স্ক্যান করুন</button>
+            <button id="stopScan" disabled>স্টপ করুন</button>
         </div>
         
-        <div class="card">
-            <h2>স্ক্যান অপশনসমূহ</h2>
-            <div class="options">
-                <div class="option-item">
-                    <input type="checkbox" id="scanBTC" checked>
-                    <label for="scanBTC">বিটকয়েন (BTC)</label>
-                </div>
-                <div class="option-item">
-                    <input type="checkbox" id="scanETH" checked>
-                    <label for="scanETH">ইথেরিয়াম (ETH)</label>
-                </div>
-                <div class="option-item">
-                    <input type="checkbox" id="scanBSC" checked>
-                    <label for="scanBSC">বাইন্যান্স চেইন (BSC)</label>
-                </div>
-            </div>
-        </div>
+        <textarea id="seedPhrase" rows="3" placeholder="সিড ফ্রেজ এখানে দেখানো হবে..." readonly></textarea>
         
-        <div id="loading" class="hidden">
+        <div id="loading" class="loading" style="display: none;">
             <div class="spinner"></div>
-            <p>ব্যালেন্স চেক করা হচ্ছে...</p>
-            <p id="progressText">প্রস্তুত</p>
+            <p id="statusText">স্ক্যান করা হচ্ছে...</p>
         </div>
         
-        <div class="card" id="resultsSection">
-            <h2>স্ক্যান ফলাফল</h2>
-            <div id="results" class="results"></div>
-            
-            <div class="stats">
-                <div class="stat-card">
-                    <div>মোট স্ক্যান করা</div>
-                    <div class="stat-value" id="totalScanned">0</div>
-                </div>
-                <div class="stat-card">
-                    <div>ব্যালেন্সযুক্ত ওয়ালেট</div>
-                    <div class="stat-value" id="withBalance">0</div>
-                </div>
-                <div class="stat-card">
-                    <div>খালি ওয়ালেট</div>
-                    <div class="stat-value" id="emptyWallets">0</div>
-                </div>
+        <div class="stats">
+            <div class="stat-box">
+                <div>মোট স্ক্যান</div>
+                <div id="totalScanned">0</div>
             </div>
+            <div class="stat-box">
+                <div>ব্যালেন্স পাওয়া</div>
+                <div id="withBalance">0</div>
+            </div>
+            <div class="stat-box">
+                <div>গতি (সিড/মিনিট)</div>
+                <div id="speed">0</div>
+            </div>
+        </div>
+        
+        <div id="results" class="result">
+            <h3>শেষ স্ক্যান ফলাফল:</h3>
+            <div id="lastResult">কোনো স্ক্যান সম্পন্ন হয়নি</div>
         </div>
     </div>
 
     <script>
         // DOM এলিমেন্টস
-        const generate12Btn = document.getElementById('generate12Btn');
-        const generate24Btn = document.getElementById('generate24Btn');
-        const clearBtn = document.getElementById('clearBtn');
-        const scanBtn = document.getElementById('scanBtn');
+        const autoGenerateBtn = document.getElementById('autoGenerate');
+        const stopScanBtn = document.getElementById('stopScan');
         const seedPhrase = document.getElementById('seedPhrase');
-        const wordBadges = document.getElementById('wordBadges');
-        const resultsDiv = document.getElementById('results');
         const loadingDiv = document.getElementById('loading');
-        const progressText = document.getElementById('progressText');
-        
-        // পরিসংখ্যান এলিমেন্টস
+        const statusText = document.getElementById('statusText');
         const totalScanned = document.getElementById('totalScanned');
         const withBalance = document.getElementById('withBalance');
-        const emptyWallets = document.getElementById('emptyWallets');
+        const speed = document.getElementById('speed');
+        const lastResult = document.getElementById('lastResult');
         
-        // স্ক্যান করা ওয়ালেট ডাটা
-        let scannedWallets = [];
+        // ভ্যারিয়েবলস
+        let isScanning = false;
         let scanCount = 0;
-        let walletsWithBalance = 0;
+        let foundCount = 0;
+        let startTime = 0;
+        let scanInterval;
         
         // ইভেন্ট লিসেনারস
-        generate12Btn.addEventListener('click', () => generateSeedPhrase(12));
-        generate24Btn.addEventListener('click', () => generateSeedPhrase(24));
-        clearBtn.addEventListener('click', clearAll);
-        scanBtn.addEventListener('click', startScanning);
-        seedPhrase.addEventListener('input', updateWordBadges);
+        autoGenerateBtn.addEventListener('click', startAutoScan);
+        stopScanBtn.addEventListener('click', stopAutoScan);
         
-        // সিড ফ্রেজ জেনারেট ফাংশন
-        async function generateSeedPhrase(wordCount) {
-            // BIP39 ওয়ার্ডলিস্ট লোড করুন
-            const response = await fetch('https://cdn.jsdelivr.net/npm/bip39@3.0.4/src/wordlists/english.json');
-            const words = await response.json();
+        // অটো স্ক্যান শুরু
+        async function startAutoScan() {
+            isScanning = true;
+            autoGenerateBtn.disabled = true;
+            stopScanBtn.disabled = false;
+            loadingDiv.style.display = 'block';
+            startTime = Date.now();
             
-            let seed = [];
-            for (let i = 0; i < wordCount; i++) {
-                const randomIndex = Math.floor(Math.random() * words.length);
-                seed.push(words[randomIndex]);
+            // স্পিড ক্যালকুলেশন ইন্টারভাল
+            scanInterval = setInterval(updateSpeed, 1000);
+            
+            // মেইন স্ক্যান লুপ
+            while (isScanning) {
+                await generateAndScan();
+                
+                // ব্রাউজারকে রেসপন্ড রাখতে
+                await new Promise(resolve => setTimeout(resolve, 100));
             }
-            seedPhrase.value = seed.join(' ');
-            updateWordBadges();
         }
         
-        // শব্দ ব্যাজ আপডেট ফাংশন
-        function updateWordBadges() {
-            const words = seedPhrase.value.trim().split(/\s+/);
-            wordBadges.innerHTML = '';
-            
-            words.forEach((word, index) => {
-                if (word) {
-                    const badge = document.createElement('span');
-                    badge.className = 'word-badge';
-                    badge.textContent = `${index + 1}. ${word}`;
-                    wordBadges.appendChild(badge);
-                }
-            });
+        // স্ক্যান বন্ধ
+        function stopAutoScan() {
+            isScanning = false;
+            autoGenerateBtn.disabled = false;
+            stopScanBtn.disabled = true;
+            loadingDiv.style.display = 'none';
+            clearInterval(scanInterval);
+            statusText.textContent = 'স্ক্যান বন্ধ করা হয়েছে';
         }
         
-        // সবকিছু ক্লিয়ার ফাংশন
-        function clearAll() {
-            seedPhrase.value = '';
-            wordBadges.innerHTML = '';
-            resultsDiv.innerHTML = '';
-            scannedWallets = [];
-            scanCount = 0;
-            walletsWithBalance = 0;
-            updateStats();
+        // গতি আপডেট
+        function updateSpeed() {
+            const minutes = (Date.now() - startTime) / 60000;
+            const currentSpeed = Math.round(scanCount / Math.max(1, minutes));
+            speed.textContent = currentSpeed;
         }
         
-        // স্ক্যানিং শুরু ফাংশন
-        async function startScanning() {
-            const seed = seedPhrase.value.trim();
-            if (!seed) {
-                alert('অনুগ্রহ করে একটি সিড ফ্রেজ লিখুন বা জেনারেট করুন');
-                return;
-            }
-            
-            // BIP39 ভ্যালিডেশন
-            if (!bip39.validateMnemonic(seed)) {
-                alert('অবৈধ সিড ফ্রেজ। অনুগ্রহ করে একটি বৈধ BIP39 সিড ফ্রেজ ব্যবহার করুন।');
-                return;
-            }
-            
-            // স্ক্যান অপশনগুলো চেক করুন
-            const scanOptions = {
-                btc: document.getElementById('scanBTC').checked,
-                eth: document.getElementById('scanETH').checked,
-                bsc: document.getElementById('scanBSC').checked
-            };
-            
-            // কোনো অপশন সিলেক্ট করা নেই কিনা চেক করুন
-            if (!Object.values(scanOptions).includes(true)) {
-                alert('অনুগ্রহ করে কমপক্ষে একটি ক্রিপ্টোকারেন্সি সিলেক্ট করুন');
-                return;
-            }
-            
-            // লোডিং স্টেট দেখান
-            loadingDiv.classList.remove('hidden');
-            resultsSection.classList.add('hidden');
-            progressText.textContent = 'প্রস্তুত...';
-            
+        // জেনারেট ও স্ক্যান
+        async function generateAndScan() {
             try {
-                // ওয়ালেট ডাটা প্রস্তুত করুন
-                const walletData = {
-                    seed: seed,
-                    addresses: [],
-                    totalBalance: 0,
-                    hasBalance: false
-                };
+                // ১. নতুন সিড ফ্রেজ জেনারেট করুন
+                statusText.textContent = 'নতুন সিড জেনারেট করা হচ্ছে...';
+                const mnemonic = bip39.generateMnemonic();
+                seedPhrase.value = mnemonic;
                 
-                // BTC অ্যাড্রেস জেনারেট এবং চেক করুন
-                if (scanOptions.btc) {
-                    progressText.textContent = 'বিটকয়েন অ্যাড্রেস চেক করা হচ্ছে...';
-                    const btcAddress = generateBTCAddress(seed);
-                    const btcBalance = await checkBTCBalance(btcAddress);
-                    
-                    walletData.addresses.push({
-                        network: 'BTC',
-                        address: btcAddress,
-                        balance: btcBalance
-                    });
-                    walletData.totalBalance += btcBalance;
-                    
-                    if (btcBalance > 0) walletData.hasBalance = true;
+                // ২. অ্যাড্রেস জেনারেট করুন
+                statusText.textContent = 'অ্যাড্রেস তৈরি করা হচ্ছে...';
+                const btcAddress = generateBTCAddress(mnemonic);
+                const ethAddress = generateETHAddress(mnemonic);
+                
+                // ৩. ব্যালেন্স চেক করুন
+                statusText.textContent = 'বিটকয়েন ব্যালেন্স চেক করা হচ্ছে...';
+                const btcBalance = await checkBTCBalance(btcAddress);
+                
+                statusText.textContent = 'ইথেরিয়াম ব্যালেন্স চেক করা হচ্ছে...';
+                const ethBalance = await checkETHBalance(ethAddress);
+                
+                // ৪. রেজাল্ট প্রসেস করুন
+                scanCount++;
+                totalScanned.textContent = scanCount;
+                
+                const hasBalance = btcBalance > 0 || ethBalance > 0;
+                if (hasBalance) {
+                    foundCount++;
+                    withBalance.textContent = foundCount;
                 }
                 
-                // ETH অ্যাড্রেস জেনারেট এবং চেক করুন
-                if (scanOptions.eth) {
-                    progressText.textContent = 'ইথেরিয়াম অ্যাড্রেস চেক করা হচ্ছে...';
-                    const ethAddress = generateETHAddress(seed);
-                    const ethBalance = await checkETHBalance(ethAddress);
-                    
-                    walletData.addresses.push({
-                        network: 'ETH',
-                        address: ethAddress,
-                        balance: ethBalance
-                    });
-                    walletData.totalBalance += ethBalance;
-                    
-                    if (ethBalance > 0) walletData.hasBalance = true;
-                }
+                // ৫. ফলাফল দেখান
+                let resultHTML = `<p><strong>সিড ফ্রেজ:</strong> ${mnemonic}</p>`;
+                resultHTML += `<div class="balance ${btcBalance > 0 ? 'has-balance' : ''}">
+                    <strong>BTC:</strong> ${btcAddress} - ব্যালেন্স: ${btcBalance} BTC
+                </div>`;
+                resultHTML += `<div class="balance ${ethBalance > 0 ? 'has-balance' : ''}">
+                    <strong>ETH:</strong> ${ethAddress} - ব্যালেন্স: ${ethBalance} ETH
+                </div>`;
                 
-                // BSC অ্যাড্রেস জেনারেট এবং চেক করুন
-                if (scanOptions.bsc) {
-                    progressText.textContent = 'বাইন্যান্স চেইন অ্যাড্রেস চেক করা হচ্ছে...';
-                    const bscAddress = generateETHAddress(seed); // BSC uses same derivation as ETH
-                    const bscBalance = await checkBSCBalance(bscAddress);
-                    
-                    walletData.addresses.push({
-                        network: 'BSC',
-                        address: bscAddress,
-                        balance: bscBalance
-                    });
-                    walletData.totalBalance += bscBalance;
-                    
-                    if (bscBalance > 0) walletData.hasBalance = true;
-                }
-                
-                // স্ক্যান সম্পূর্ণ
-                progressText.textContent = 'স্ক্যান সম্পূর্ণ!';
-                
-                // ফলাফল যোগ করুন
-                addWalletResult(walletData);
+                lastResult.innerHTML = resultHTML;
                 
             } catch (error) {
-                console.error('Scan error:', error);
-                alert('একটি ত্রুটি ঘটেছে: ' + error.message);
-            } finally {
-                loadingDiv.classList.add('hidden');
-                resultsSection.classList.remove('hidden');
+                console.error('Error in scanning:', error);
+                statusText.textContent = 'ত্রুটি: ' + error.message;
             }
         }
         
@@ -433,7 +258,7 @@
             return address;
         }
         
-        // ETH/BSC অ্যাড্রেস জেনারেটর
+        // ETH অ্যাড্রেস জেনারেটর
         function generateETHAddress(mnemonic, index = 0) {
             const wallet = ethers.Wallet.fromMnemonic(mnemonic, `m/44'/60'/0'/0/${index}`);
             return wallet.address;
@@ -462,57 +287,6 @@
                 return 0;
             }
         }
-        
-        // BSC ব্যালেন্স চেক
-        async function checkBSCBalance(address) {
-            try {
-                const response = await fetch(`https://api.bscscan.com/api?module=account&action=balance&address=${address}&tag=latest`);
-                const data = await response.json();
-                return data.result / 1e18; // Wei থেকে BNB
-            } catch (error) {
-                console.error('BSC balance check error:', error);
-                return 0;
-            }
-        }
-        
-        // ওয়ালেট রেজাল্ট যোগ করুন
-        function addWalletResult(walletData) {
-            scannedWallets.push(walletData);
-            scanCount++;
-            if (walletData.hasBalance) walletsWithBalance++;
-            
-            const walletDiv = document.createElement('div');
-            walletDiv.className = `wallet ${walletData.hasBalance ? 'has-balance' : 'no-balance'}`;
-            
-            let addressesHTML = '';
-            walletData.addresses.forEach(addr => {
-                addressesHTML += `
-                    <li>
-                        <strong>${addr.network}:</strong> ${addr.address} 
-                        - ব্যালেন্স: <span class="balance ${addr.balance > 0 ? 'positive-balance' : 'zero-balance'}">
-                            ${addr.balance.toFixed(8)} ${addr.network}
-                        </span>
-                    </li>
-                `;
-            });
-            
-            walletDiv.innerHTML = `
-                <h3>সিড ফ্রেজ: ${walletData.seed}</h3>
-                <p>ডেরাইভড অ্যাড্রেসসমূহ:</p>
-                <ul>${addressesHTML}</ul>
-                <p>মোট ব্যালেন্স: <strong>${walletData.totalBalance.toFixed(8)}</strong></p>
-            `;
-            
-            resultsDiv.prepend(walletDiv);
-            updateStats();
-        }
-        
-        // পরিসংখ্যান আপডেট করুন
-        function updateStats() {
-            totalScanned.textContent = scanCount;
-            withBalance.textContent = walletsWithBalance;
-            emptyWallets.textContent = scanCount - walletsWithBalance;
-        }
     </script>
 </body>
-  </html>
+</html>
